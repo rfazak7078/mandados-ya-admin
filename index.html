@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mandados YA - Panel Administrativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar-gradient { background: linear-gradient(180deg, #4c1d95 0%, #7c3aed 100%); }
+        .hidden { display: none; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-purple-500 to-blue-600 min-h-screen">
-    <div class="min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -21,11 +26,11 @@
             <form class="space-y-6" onsubmit="loginAdmin(event)">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email de Administrador</label>
-                    <input type="email" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="admin@mandadosya.net" required>
+                    <input type="email" id="adminEmail" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="admin@mandadosya.net" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
-                    <input type="password" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Tu contraseña" required>
+                    <input type="password" id="adminPassword" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="admin123" required>
                 </div>
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold">
                     Acceder al Panel
@@ -39,65 +44,716 @@
                     <p><strong>Contraseña:</strong> admin123</p>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div id="adminDashboard" class="hidden">
-                <h2 class="text-xl font-bold mb-6 text-center">Dashboard Administrativo</h2>
-                
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-blue-100 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-blue-600">50+</p>
-                        <p class="text-sm text-gray-600">Restaurantes</p>
-                    </div>
-                    <div class="bg-green-100 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-green-600">120</p>
-                        <p class="text-sm text-gray-600">Repartidores</p>
-                    </div>
-                    <div class="bg-orange-100 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-orange-600">2,450</p>
-                        <p class="text-sm text-gray-600">Pedidos/Mes</p>
-                    </div>
-                    <div class="bg-purple-100 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-purple-600">$85k</p>
-                        <p class="text-sm text-gray-600">Ingresos</p>
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🛡️</span>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Mandados YA Admin</h1>
+                        <p class="text-sm text-gray-500">Panel de Administración</p>
                     </div>
                 </div>
-
-                <div class="space-y-4 mb-6">
-                    <div class="bg-white border rounded-lg p-4">
-                        <h3 class="font-semibold mb-2">🏪 Gestión de Restaurantes</h3>
-                        <p class="text-sm text-gray-600 mb-3">Administrar socios comerciales</p>
-                        <button class="bg-blue-500 text-white px-4 py-2 rounded text-sm">Ver Restaurantes</button>
-                    </div>
-                    
-                    <div class="bg-white border rounded-lg p-4">
-                        <h3 class="font-semibold mb-2">🚚 Control de Repartidores</h3>
-                        <p class="text-sm text-gray-600 mb-3">Gestionar equipo de delivery</p>
-                        <button class="bg-green-500 text-white px-4 py-2 rounded text-sm">Ver Repartidores</button>
-                    </div>
-                </div>
-
-                <button onclick="logoutAdmin()" class="w-full bg-red-500 text-white py-2 rounded-lg">
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm">
                     Cerrar Sesión
                 </button>
             </div>
+        </header>
 
-            <div class="mt-8 text-center text-sm text-gray-500">
-                <p>© 2025 Mandados YA - Panel Administrativo</p>
+        <div class="flex">
+            <!-- Sidebar -->
+            <div class="w-64 sidebar-gradient text-white min-h-screen">
+                <nav class="p-4 space-y-2">
+                    <button onclick="showSection('dashboard')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors nav-item" id="nav-dashboard">
+                        📊 Dashboard
+                    </button>
+                    <button onclick="showSection('restaurants')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors nav-item" id="nav-restaurants">
+                        🏪 Restaurantes
+                    </button>
+                    <button onclick="showSection('drivers')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors nav-item" id="nav-drivers">
+                        🚚 Repartidores
+                    </button>
+                    <button onclick="showSection('orders')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors nav-item" id="nav-orders">
+                        📦 Pedidos
+                    </button>
+                    <button onclick="showSection('payments')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors nav-item" id="nav-payments">
+                        💰 Cuentas Corrientes
+                    </button>
+                    <button onclick="showSection('settings')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors nav-item" id="nav-settings">
+                        ⚙️ Configuración
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 p-6">
+                <!-- Dashboard Section -->
+                <div id="section-dashboard" class="section">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Dashboard General</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Restaurantes Activos</p>
+                                    <p class="text-2xl font-bold text-blue-600" id="totalRestaurants">0</p>
+                                </div>
+                                <div class="bg-blue-100 p-3 rounded-full">
+                                    <span class="text-xl">🏪</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Repartidores</p>
+                                    <p class="text-2xl font-bold text-green-600" id="totalDrivers">0</p>
+                                </div>
+                                <div class="bg-green-100 p-3 rounded-full">
+                                    <span class="text-xl">🚚</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Pedidos Hoy</p>
+                                    <p class="text-2xl font-bold text-orange-600" id="todayOrders">0</p>
+                                </div>
+                                <div class="bg-orange-100 p-3 rounded-full">
+                                    <span class="text-xl">📦</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Ingresos del Mes</p>
+                                    <p class="text-2xl font-bold text-purple-600" id="monthlyRevenue">$0</p>
+                                </div>
+                                <div class="bg-purple-100 p-3 rounded-full">
+                                    <span class="text-xl">💰</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <h3 class="text-lg font-semibold mb-4">Pedidos Recientes</h3>
+                            <div class="space-y-3" id="recentOrdersList">
+                                <p class="text-gray-500 text-center py-4">No hay pedidos recientes</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <h3 class="text-lg font-semibold mb-4">Actividad del Sistema</h3>
+                            <div class="space-y-3" id="systemActivity">
+                                <div class="flex items-center space-x-3">
+                                    <span class="bg-green-100 text-green-600 p-2 rounded-full text-sm">✅</span>
+                                    <span class="text-sm">Sistema iniciado correctamente</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restaurants Section -->
+                <div id="section-restaurants" class="section hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Gestión de Restaurantes</h2>
+                        <button onclick="showAddRestaurantModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                            + Agregar Restaurante
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50">
+                            <h3 class="font-semibold">Restaurantes Registrados</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Restaurante</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ventas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="restaurantsTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Los restaurantes se llenarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drivers Section -->
+                <div id="section-drivers" class="section hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Gestión de Repartidores</h2>
+                        <button onclick="showAddDriverModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                            + Agregar Repartidor
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50">
+                            <h3 class="font-semibold">Repartidores Registrados</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entregas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ganancias</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="driversTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Los repartidores se llenarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Section -->
+                <div id="section-orders" class="section hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Gestión de Pedidos</h2>
+                    
+                    <div class="bg-white rounded-xl shadow-sm border">
+                        <div class="p-4 border-b bg-gray-50">
+                            <h3 class="font-semibold">Pedidos del Sistema</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="text-center py-8">
+                                <span class="text-4xl">📦</span>
+                                <p class="text-gray-500 mt-2">Los pedidos aparecerán aquí cuando el sistema esté conectado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments Section -->
+                <div id="section-payments" class="section hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Cuentas Corrientes</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border">
+                            <div class="p-4 border-b bg-gray-50">
+                                <h3 class="font-semibold">Cuentas de Restaurantes</h3>
+                            </div>
+                            <div class="p-6" id="restaurantAccounts">
+                                <p class="text-gray-500 text-center py-4">No hay cuentas registradas</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border">
+                            <div class="p-4 border-b bg-gray-50">
+                                <h3 class="font-semibold">Cuentas de Repartidores</h3>
+                            </div>
+                            <div class="p-6" id="driverAccounts">
+                                <p class="text-gray-500 text-center py-4">No hay cuentas registradas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="section-settings" class="section hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Configuración del Sistema</h2>
+                    
+                    <div class="bg-white rounded-xl shadow-sm border p-6">
+                        <h3 class="text-lg font-semibold mb-4">Configuración General</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Comisión por Pedido (%)</label>
+                                <input type="number" class="w-full p-3 border rounded-lg" value="10" min="0" max="100">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tarifa Base Delivery ($)</label>
+                                <input type="number" class="w-full p-3 border rounded-lg" value="50" min="0">
+                            </div>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                                Guardar Configuración
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Add Restaurant Modal -->
+    <div id="addRestaurantModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Agregar Nuevo Restaurante</h3>
+                <button onclick="hideAddRestaurantModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            
+            <form onsubmit="addRestaurant(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Restaurante</label>
+                        <input type="text" id="restaurantName" class="w-full p-3 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Cocina</label>
+                        <select id="restaurantType" class="w-full p-3 border rounded-lg" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="italiana">Italiana</option>
+                            <option value="argentina">Argentina</option>
+                            <option value="japonesa">Japonesa</option>
+                            <option value="mexicana">Mexicana</option>
+                            <option value="uruguaya">Uruguaya</option>
+                            <option value="china">China</option>
+                            <option value="americana">Americana</option>
+                            <option value="vegetariana">Vegetariana</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="restaurantEmail" class="w-full p-3 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                        <input type="tel" id="restaurantPhone" class="w-full p-3 border rounded-lg" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                        <input type="text" id="restaurantAddress" class="w-full p-3 border rounded-lg" required>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <h4 class="font-semibold mb-3">Información de Acceso</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Usuario (se genera automáticamente)</label>
+                            <input type="text" id="restaurantUsername" class="w-full p-3 border rounded-lg bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña (se genera automáticamente)</label>
+                            <input type="text" id="restaurantPassword" class="w-full p-3 border rounded-lg bg-gray-100" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                        Crear Restaurante
+                    </button>
+                    <button type="button" onclick="hideAddRestaurantModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-semibold">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Driver Modal -->
+    <div id="addDriverModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-lg">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Agregar Nuevo Repartidor</h3>
+                <button onclick="hideAddDriverModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            
+            <form onsubmit="addDriver(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                    <input type="text" id="driverName" class="w-full p-3 border rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                    <input type="tel" id="driverPhone" class="w-full p-3 border rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Vehículo</label>
+                    <select id="driverVehicle" class="w-full p-3 border rounded-lg" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="moto">Moto</option>
+                        <option value="bicicleta">Bicicleta</option>
+                        <option value="auto">Auto</option>
+                        <option value="pie">A pie</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña (se genera automáticamente)</label>
+                    <input type="text" id="driverPassword" class="w-full p-3 border rounded-lg bg-gray-100" readonly>
+                </div>
+
+                <div class="flex space-x-4 pt-4">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold">
+                        Crear Repartidor
+                    </button>
+                    <button type="button" onclick="hideAddDriverModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-semibold">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        function loginAdmin(event) {
-            event.preventDefault();
-            document.querySelector('form').style.display = 'none';
-            document.querySelector('.mt-8.p-4').style.display = 'none';
-            document.getElementById('adminDashboard').classList.remove('hidden');
+        // Data Storage
+        let restaurants = JSON.parse(localStorage.getItem('mandados_restaurants') || '[]');
+        let drivers = JSON.parse(localStorage.getItem('mandados_drivers') || '[]');
+        let orders = JSON.parse(localStorage.getItem('mandados_orders') || '[]');
+
+        // Initialize with demo data if empty
+        if (restaurants.length === 0) {
+            restaurants = [
+                {
+                    id: 1,
+                    name: "Pizza Napoli",
+                    type: "italiana",
+                    email: "napoli@mandadosya.com",
+                    phone: "+59899123456",
+                    address: "18 de Julio 1234, Montevideo",
+                    username: "napoli",
+                    password: "napoli123",
+                    status: "activo",
+                    sales: 12450,
+                    commission: 1245
+                },
+                {
+                    id: 2,
+                    name: "El Buen Sabor",
+                    type: "argentina",
+                    email: "buensabor@mandadosya.com",
+                    phone: "+59899234567",
+                    address: "Rivera 567, Montevideo",
+                    username: "buensabor",
+                    password: "sabor123",
+                    status: "activo",
+                    sales: 8930,
+                    commission: 893
+                }
+            ];
+            localStorage.setItem('mandados_restaurants', JSON.stringify(restaurants));
         }
 
-        function logoutAdmin() {
-            location.reload();
+        if (drivers.length === 0) {
+            drivers = [
+                {
+                    id: 1,
+                    name: "Carlos Rodríguez",
+                    phone: "+59899123456",
+                    vehicle: "moto",
+                    password: "carlos123",
+                    status: "activo",
+                    deliveries: 245,
+                    earnings: 15670
+                },
+                {
+                    id: 2,
+                    name: "Ana Martínez",
+                    phone: "+59899789012",
+                    vehicle: "bicicleta",
+                    password: "ana123",
+                    status: "activo",
+                    deliveries: 180,
+                    earnings: 11240
+                }
+            ];
+            localStorage.setItem('mandados_drivers', JSON.stringify(drivers));
         }
+
+        // Login function
+        function loginAdmin(event) {
+            event.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (email === 'admin@mandadosya.net' && password === 'admin123') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                loadDashboardData();
+                showSection('dashboard');
+            } else {
+                alert('Credenciales incorrectas');
+            }
+        }
+
+        // Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('bg-purple-700');
+            });
+
+            // Show selected section
+            document.getElementById(`section-${sectionName}`).classList.remove('hidden');
+            document.getElementById(`nav-${sectionName}`).classList.add('bg-purple-700');
+
+            // Load section data
+            if (sectionName === 'restaurants') {
+                loadRestaurantsTable();
+            } else if (sectionName === 'drivers') {
+                loadDriversTable();
+            } else if (sectionName === 'payments') {
+                loadPaymentsData();
+            }
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            document.getElementById('totalRestaurants').textContent = restaurants.length;
+            document.getElementById('totalDrivers').textContent = drivers.length;
+            document.getElementById('todayOrders').textContent = orders.length;
+            
+            const totalRevenue = restaurants.reduce((sum, r) => sum + r.sales, 0);
+            document.getElementById('monthlyRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+        }
+
+        // Load restaurants table
+        function loadRestaurantsTable() {
+            const tbody = document.getElementById('restaurantsTable');
+            tbody.innerHTML = '';
+
+            restaurants.forEach(restaurant => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-900">${restaurant.name}</div>
+                            <div class="text-sm text-gray-500">${restaurant.type}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${restaurant.email}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${restaurant.status === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${restaurant.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${restaurant.sales.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editRestaurant(${restaurant.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                        <button onclick="viewCredentials(${restaurant.id})" class="text-green-600 hover:text-green-900 mr-3">Credenciales</button>
+                        <button onclick="deleteRestaurant(${restaurant.id})" class="text-red-600 hover:text-red-900">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load drivers table
+        function loadDriversTable() {
+            const tbody = document.getElementById('driversTable');
+            tbody.innerHTML = '';
+
+            drivers.forEach(driver => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${driver.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${driver.phone}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${driver.status === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${driver.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${driver.deliveries}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${driver.earnings.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editDriver(${driver.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                        <button onclick="viewDriverCredentials(${driver.id})" class="text-green-600 hover:text-green-900 mr-3">Credenciales</button>
+                        <button onclick="deleteDriver(${driver.id})" class="text-red-600 hover:text-red-900">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Modal functions
+        function showAddRestaurantModal() {
+            // Generate automatic credentials
+            const name = '';
+            document.getElementById('restaurantUsername').value = '';
+            document.getElementById('restaurantPassword').value = '';
+            document.getElementById('addRestaurantModal').classList.remove('hidden');
+        }
+
+        function hideAddRestaurantModal() {
+            document.getElementById('addRestaurantModal').classList.add('hidden');
+            document.getElementById('restaurantName').value = '';
+        }
+
+        function showAddDriverModal() {
+            // Generate automatic password
+            document.getElementById('driverPassword').value = 'repartidor' + Math.floor(Math.random() * 1000);
+            document.getElementById('addDriverModal').classList.remove('hidden');
+        }
+
+        function hideAddDriverModal() {
+            document.getElementById('addDriverModal').classList.add('hidden');
+        }
+
+        // Auto-generate credentials when restaurant name changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('restaurantName');
+            if (nameInput) {
+                nameInput.addEventListener('input', function() {
+                    const name = this.value.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+                    document.getElementById('restaurantUsername').value = name;
+                    document.getElementById('restaurantPassword').value = name + '123';
+                });
+            }
+        });
+
+        // Add restaurant
+        function addRestaurant(event) {
+            event.preventDefault();
+            
+            const newRestaurant = {
+                id: restaurants.length + 1,
+                name: document.getElementById('restaurantName').value,
+                type: document.getElementById('restaurantType').value,
+                email: document.getElementById('restaurantEmail').value,
+                phone: document.getElementById('restaurantPhone').value,
+                address: document.getElementById('restaurantAddress').value,
+                username: document.getElementById('restaurantUsername').value,
+                password: document.getElementById('restaurantPassword').value,
+                status: 'activo',
+                sales: 0,
+                commission: 0
+            };
+
+            restaurants.push(newRestaurant);
+            localStorage.setItem('mandados_restaurants', JSON.stringify(restaurants));
+            
+            hideAddRestaurantModal();
+            loadRestaurantsTable();
+            loadDashboardData();
+            
+            alert(`Restaurante "${newRestaurant.name}" creado exitosamente!\n\nCredenciales de acceso:\nUsuario: ${newRestaurant.username}\nContraseña: ${newRestaurant.password}`);
+        }
+
+        // Add driver
+        function addDriver(event) {
+            event.preventDefault();
+            
+            const newDriver = {
+                id: drivers.length + 1,
+                name: document.getElementById('driverName').value,
+                phone: document.getElementById('driverPhone').value,
+                vehicle: document.getElementById('driverVehicle').value,
+                password: document.getElementById('driverPassword').value,
+                status: 'activo',
+                deliveries: 0,
+                earnings: 0
+            };
+
+            drivers.push(newDriver);
+            localStorage.setItem('mandados_drivers', JSON.stringify(drivers));
+            
+            hideAddDriverModal();
+            loadDriversTable();
+            loadDashboardData();
+            
+            alert(`Repartidor "${newDriver.name}" creado exitosamente!\n\nCredenciales de acceso:\nTeléfono: ${newDriver.phone}\nContraseña: ${newDriver.password}`);
+        }
+
+        // View credentials
+        function viewCredentials(id) {
+            const restaurant = restaurants.find(r => r.id === id);
+            if (restaurant) {
+                alert(`Credenciales de ${restaurant.name}:\n\nUsuario: ${restaurant.username}\nContraseña: ${restaurant.password}\nEmail: ${restaurant.email}`);
+            }
+        }
+
+        function viewDriverCredentials(id) {
+            const driver = drivers.find(d => d.id === id);
+            if (driver) {
+                alert(`Credenciales de ${driver.name}:\n\nTeléfono: ${driver.phone}\nContraseña: ${driver.password}`);
+            }
+        }
+
+        // Delete functions
+        function deleteRestaurant(id) {
+            if (confirm('¿Estás seguro de eliminar este restaurante?')) {
+                restaurants = restaurants.filter(r => r.id !== id);
+                localStorage.setItem('mandados_restaurants', JSON.stringify(restaurants));
+                loadRestaurantsTable();
+                loadDashboardData();
+            }
+        }
+
+        function deleteDriver(id) {
+            if (confirm('¿Estás seguro de eliminar este repartidor?')) {
+                drivers = drivers.filter(d => d.id !== id);
+                localStorage.setItem('mandados_drivers', JSON.stringify(drivers));
+                loadDriversTable();
+                loadDashboardData();
+            }
+        }
+
+        // Edit functions (placeholder)
+        function editRestaurant(id) {
+            alert('Función de edición en desarrollo');
+        }
+
+        function editDriver(id) {
+            alert('Función de edición en desarrollo');
+        }
+
+        // Load payments data
+        function loadPaymentsData() {
+            const restaurantAccountsDiv = document.getElementById('restaurantAccounts');
+            const driverAccountsDiv = document.getElementById('driverAccounts');
+
+            // Restaurant accounts
+            restaurantAccountsDiv.innerHTML = '';
+            restaurants.forEach(restaurant => {
+                const accountDiv = document.createElement('div');
+                accountDiv.className = 'flex justify-between items-center py-2 border-b';
+                accountDiv.innerHTML = `
+                    <span class="text-sm font-medium">${restaurant.name}</span>
+                    <span class="text-sm text-green-600">$${restaurant.sales.toLocaleString()}</span>
+                `;
+                restaurantAccountsDiv.appendChild(accountDiv);
+            });
+
+            // Driver accounts
+            driverAccountsDiv.innerHTML = '';
+            drivers.forEach(driver => {
+                const accountDiv = document.createElement('div');
+                accountDiv.className = 'flex justify-between items-center py-2 border-b';
+                accountDiv.innerHTML = `
+                    <span class="text-sm font-medium">${driver.name}</span>
+                    <span class="text-sm text-green-600">$${driver.earnings.toLocaleString()}</span>
+                `;
+                driverAccountsDiv.appendChild(accountDiv);
+            });
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('¿Estás seguro de cerrar sesión?')) {
+                document.getElementById('adminDashboard').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Panel Admin initialized');
+        });
     </script>
 </body>
 </html>
